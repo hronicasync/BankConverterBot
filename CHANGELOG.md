@@ -6,6 +6,12 @@ Format: `[version] YYYY-MM-DD — description`
 
 ---
 
+## [0.5.0] 2026-04-17
+
+- Added `.dockerignore` (excluded `.venv`, `.git`, `__pycache__` from build context)
+- Updated `docker-compose.yml`: removed deprecated `version:` field, added log rotation (10MB × 3 files)
+- Added `deploy.sh` — one-command SSH deploy: clones repo on first run, then `git pull + docker compose up --build`
+
 ## [0.4.0] 2026-04-17
 
 - Added `/setrate <value>` — manual override for the RUB→KGS rate (e.g. `/setrate 0.0152`)
