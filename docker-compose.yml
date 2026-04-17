@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+  kgs_bot:
+    build: .
+    container_name: kgs_converter_bot
+    restart: always
+    env_file: .env
+    network_mode: host
