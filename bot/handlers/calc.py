@@ -8,8 +8,8 @@ from aiogram.filters import Command
 from aiogram.types import Message
 
 from bot.config import load_config
-from bot.services.calculator import CalcResult, calculate, fmt_calc
-from bot.services.parser import ParserError, fetch_rates
+from bot.services.calculator import calculate, fmt_calc
+from bot.services.parser import ParserError, fetch_rates, fetch_tbank_rate
 from bot.utils.cache import rates_cache
 
 router = Router()
@@ -24,8 +24,8 @@ def _parse_amount(text: str) -> float | None:
     return float(m.group(1).replace(",", "."))
 
 
-def _updated_at() -> str:
-    age = rates_cache.age_seconds("rates")
+def _fmt_updated_at(cache_key: str) -> str:
+    age = rates_cache.age_seconds(cache_key)
     if age is None:
         return "неизвестно"
     updated = datetime.datetime.now() - datetime.timedelta(seconds=age)
@@ -55,35 +55,46 @@ async def handle_plain_amount(message: Message) -> None:
 
 async def _do_calc(message: Message, usd_amount: float) -> None:
     config = load_config()
-    stale = False
+    warnings: list[str] = []
 
     try:
-        rates = await fetch_rates()
+        ayil_rates = await fetch_rates()
     except ParserError:
-        stale_rates = rates_cache.get_stale("rates")
-        if stale_rates is None:
+        ayil_rates = rates_cache.get_stale("rates")
+        if ayil_rates is None:
             await message.answer(
-                "❌ Не удалось получить курсы с сайта Айыл Банка.\n\n"
+                "❌ Не удалось получить курсы Айыл Банка.\n\n"
                 "Проверь сайт вручную: https://abank.kg\n"
                 "Или попробуй /refresh"
             )
             return
-        rates = stale_rates
-        stale = True
+        warnings.append("⚠️ Курс Айыл Банка устаревший — попробуй /refresh")
 
     try:
-        result = calculate(usd_amount, rates, config.rates_buffer_percent)
+        tbank_rate = await fetch_tbank_rate()
+    except ParserError:
+        tbank_rate = rates_cache.get_stale("tbank_rate")
+        if tbank_rate is None:
+            await message.answer(
+                "❌ Не удалось получить курс T-Банка.\n\n"
+                "Попробуй /refresh"
+            )
+            return
+        warnings.append("⚠️ Курс T-Банка устаревший — попробуй /refresh")
+
+    try:
+        result = calculate(usd_amount, ayil_rates, tbank_rate, config.rates_buffer_percent)
     except ValueError as e:
         await message.answer(f"⚠️ {e}")
         return
 
-    text = fmt_calc(result, _updated_at())
+    text = fmt_calc(
+        result,
+        ayil_updated_at=_fmt_updated_at("rates"),
+        tbank_updated_at=_fmt_updated_at("tbank_rate"),
+    )
 
-    if stale:
-        age = rates_cache.age_seconds("rates")
-        hours = int((age or 0) // 3600)
-        minutes = int(((age or 0) % 3600) // 60)
-        ago = f"{hours} ч {minutes} мин" if hours else f"{minutes} мин"
-        text += f"\n\n⚠️ Используются устаревшие курсы ({ago} назад)\nПопробуй /refresh"
+    if warnings:
+        text += "\n\n" + "\n".join(warnings)
 
     await message.answer(text)
