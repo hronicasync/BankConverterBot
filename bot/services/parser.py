@@ -10,7 +10,7 @@ from bot.utils.cache import rates_cache
 
 logger = logging.getLogger(__name__)
 
-ABANK_URL = "https://abank.kg/ru"
+ABANK_URL = "https://abank.kg/"
 TBANK_URL = "https://api.tbank.ru/v1/currency_rates?from=RUB&to=KGS"
 
 ABANK_CACHE_KEY = "rates"
