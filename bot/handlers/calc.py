@@ -9,7 +9,7 @@ from aiogram.types import Message
 
 from bot.config import load_config
 from bot.services.calculator import calculate, fmt_calc
-from bot.services.parser import ParserError, fetch_rates, fetch_tbank_rate
+from bot.services.parser import ParserError, fetch_rates, fetch_tbank_rate, get_manual_tbank_rate
 from bot.utils.cache import rates_cache
 
 router = Router()
@@ -88,10 +88,11 @@ async def _do_calc(message: Message, usd_amount: float) -> None:
         await message.answer(f"⚠️ {e}")
         return
 
+    tbank_label = "ручной курс" if get_manual_tbank_rate() is not None else _fmt_updated_at("tbank_rate")
     text = fmt_calc(
         result,
         ayil_updated_at=_fmt_updated_at("rates"),
-        tbank_updated_at=_fmt_updated_at("tbank_rate"),
+        tbank_updated_at=tbank_label,
     )
 
     if warnings:

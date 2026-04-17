@@ -6,6 +6,14 @@ Format: `[version] YYYY-MM-DD — description`
 
 ---
 
+## [0.4.0] 2026-04-17
+
+- Added `/setrate <value>` — manual override for the RUB→KGS rate (e.g. `/setrate 0.0152`)
+- Added `/resetrate` — clears the override and returns to T-Bank API rate
+- When manual rate is active, `/calc` and `/rates` display "ручной курс" instead of update timestamp
+- `fetch_tbank_rate()` short-circuits to manual value when override is set (bypasses cache and API)
+- Registered `admin` router in `main.py`; new commands appear in the bot menu
+
 ## [0.3.0] 2026-04-17
 
 - Added T-Bank API as source for RUB→KGS rate (`CUTransfersPrivate` category — EAEU transfers)

@@ -6,7 +6,7 @@ from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.types import BotCommand
 
 from bot.config import load_config
-from bot.handlers import calc, rates, start
+from bot.handlers import admin, calc, rates, start
 
 logging.basicConfig(
     level=logging.INFO,
@@ -24,12 +24,15 @@ async def main() -> None:
     dp = Dispatcher()
     dp.include_router(start.router)
     dp.include_router(rates.router)
+    dp.include_router(admin.router)
     dp.include_router(calc.router)  # last — catches plain text / numbers
 
     await bot.set_my_commands([
         BotCommand(command="calc", description="Рассчитать сколько ₽ нужно для указанных $"),
         BotCommand(command="rates", description="Текущие курсы Айыл Банка"),
         BotCommand(command="refresh", description="Принудительно обновить курсы"),
+        BotCommand(command="setrate", description="Установить курс RUB→KGS вручную"),
+        BotCommand(command="resetrate", description="Сбросить на курс T-Банка API"),
         BotCommand(command="help", description="Помощь"),
     ])
 

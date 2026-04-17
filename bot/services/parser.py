@@ -32,6 +32,23 @@ class ParserError(Exception):
     pass
 
 
+_manual_tbank_rate: float | None = None
+
+
+def set_manual_tbank_rate(rate: float) -> None:
+    global _manual_tbank_rate
+    _manual_tbank_rate = rate
+
+
+def reset_manual_tbank_rate() -> None:
+    global _manual_tbank_rate
+    _manual_tbank_rate = None
+
+
+def get_manual_tbank_rate() -> float | None:
+    return _manual_tbank_rate
+
+
 async def _fetch_html(session: aiohttp.ClientSession) -> str:
     headers = {"User-Agent": "Mozilla/5.0 (compatible; BankConverterBot/1.0)"}
     async with session.get(ABANK_URL, headers=headers, timeout=aiohttp.ClientTimeout(total=10)) as resp:
@@ -94,6 +111,9 @@ async def fetch_rates(force: bool = False) -> Rates:
 
 async def fetch_tbank_rate(force: bool = False) -> float:
     """Return T-Bank's RUB→KGS transfer rate (KGS per 1 RUB)."""
+    if _manual_tbank_rate is not None:
+        return _manual_tbank_rate
+
     if not force:
         cached = rates_cache.get(TBANK_CACHE_KEY)
         if cached is not None:
