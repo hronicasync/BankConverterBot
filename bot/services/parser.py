@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 import aiohttp
 from bs4 import BeautifulSoup
+from curl_cffi.requests import AsyncSession as CurlSession
 
 from bot.utils.cache import rates_cache
 
@@ -49,11 +50,11 @@ def get_manual_tbank_rate() -> float | None:
     return _manual_tbank_rate
 
 
-async def _fetch_html(session: aiohttp.ClientSession) -> str:
-    headers = {"User-Agent": "Mozilla/5.0 (compatible; BankConverterBot/1.0)"}
-    async with session.get(ABANK_URL, headers=headers, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+async def _fetch_html() -> str:
+    async with CurlSession(impersonate="chrome120") as session:
+        resp = await session.get(ABANK_URL, timeout=15)
         resp.raise_for_status()
-        return await resp.text()
+        return resp.text
 
 
 def _parse_rates(html: str) -> Rates:
@@ -95,8 +96,7 @@ async def fetch_rates(force: bool = False) -> Rates:
             return cached
 
     try:
-        async with aiohttp.ClientSession() as session:
-            html = await _fetch_html(session)
+        html = await _fetch_html()
         rates = _parse_rates(html)
         rates_cache.set(ABANK_CACHE_KEY, rates)
         logger.info("Ayil Bank rates refreshed: USD sell=%.4f", rates.usd_sell)
