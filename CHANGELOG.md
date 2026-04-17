@@ -6,6 +6,11 @@ Format: `[version] YYYY-MM-DD — description`
 
 ---
 
+## [0.6.0] 2026-04-17
+
+- Fixed Ayil Bank scraping: switched from aiohttp to `curl-cffi` with Chrome impersonation to bypass Cloudflare TLS fingerprinting
+- Fixed `ABANK_URL`: changed from `/ru` (meta-refresh redirect, not followed by aiohttp) to `/` (real page)
+
 ## [0.5.0] 2026-04-17
 
 - Added `.dockerignore` (excluded `.venv`, `.git`, `__pycache__` from build context)
