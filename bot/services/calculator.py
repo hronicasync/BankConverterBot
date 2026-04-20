@@ -44,7 +44,7 @@ def fmt_calc(result: CalcResult, ayil_updated_at: str, tbank_updated_at: str) ->
     r = result
     rub_exact_fmt = f"{r.rub_exact:,.0f}".replace(",", " ")
     rub_buf_fmt = f"{r.rub_buffered:,.0f}".replace(",", " ")
-    kgs_fmt = f"{r.kgs_needed:,.0f}".replace(",", " ")
+    kgs_fmt = f"{r.kgs_needed:,.1f}".replace(",", " ")
 
     return (
         f"💰 Расчёт для {r.usd_amount:.2f}$\n"
