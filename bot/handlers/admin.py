@@ -9,6 +9,26 @@ from bot.services.parser import get_manual_tbank_rate, reset_manual_tbank_rate, 
 router = Router()
 
 
+@router.message(Command("emojiid"))
+async def cmd_emojiid(message: Message) -> None:
+    """Usage: /emojiid <custom emoji> — returns its custom_emoji_id."""
+    custom_emojis = [e for e in (message.entities or []) if e.type == "custom_emoji"]
+    if not custom_emojis:
+        await message.answer(
+            "Напиши команду вместе с кастомным эмодзи в одном сообщении:\n"
+            "<code>/emojiid </code>🔥&lt;— вставь сюда кастомный эмодзи",
+            parse_mode="HTML",
+        )
+        return
+
+    lines = []
+    for e in custom_emojis:
+        placeholder = (message.text or "")[e.offset : e.offset + e.length]
+        lines.append(f"ID: <code>{e.custom_emoji_id}</code>  (заглушка: {placeholder})")
+
+    await message.answer("\n".join(lines), parse_mode="HTML")
+
+
 @router.message(Command("setrate"))
 async def cmd_setrate(message: Message) -> None:
     parts = (message.text or "").split(maxsplit=1)
