@@ -1,4 +1,5 @@
 .env
+CHANGELOG.md
 __pycache__/
 *.pyc
 *.pyo
