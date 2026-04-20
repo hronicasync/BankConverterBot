@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import logging
+import os
 from dataclasses import dataclass
+from pathlib import Path
 
 import aiohttp
 from bs4 import BeautifulSoup
@@ -33,17 +35,30 @@ class ParserError(Exception):
     pass
 
 
-_manual_tbank_rate: float | None = None
+_RATE_FILE = Path(os.getenv("MANUAL_RATE_FILE", "/data/manual_rate.txt"))
+
+
+def _load_manual_rate() -> float | None:
+    try:
+        return float(_RATE_FILE.read_text().strip())
+    except (FileNotFoundError, ValueError):
+        return None
+
+
+_manual_tbank_rate: float | None = _load_manual_rate()
 
 
 def set_manual_tbank_rate(rate: float) -> None:
     global _manual_tbank_rate
     _manual_tbank_rate = rate
+    _RATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    _RATE_FILE.write_text(str(rate))
 
 
 def reset_manual_tbank_rate() -> None:
     global _manual_tbank_rate
     _manual_tbank_rate = None
+    _RATE_FILE.unlink(missing_ok=True)
 
 
 def get_manual_tbank_rate() -> float | None:
