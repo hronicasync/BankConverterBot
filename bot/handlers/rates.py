@@ -31,7 +31,7 @@ async def cmd_rates(message: Message) -> None:
             ayil_rates, tbank_rate,
             ayil_updated_at=_updated_at("rates"),
             tbank_updated_at=tbank_label,
-        ))
+        ), parse_mode="HTML")
     except ParserError as e:
         await message.answer(
             f"❌ Не удалось получить курсы: {e}\n\nПопробуй /refresh"
@@ -52,7 +52,8 @@ async def cmd_refresh(message: Message) -> None:
                 ayil_rates, tbank_rate,
                 ayil_updated_at=_updated_at("rates"),
                 tbank_updated_at=tbank_label,
-            )
+            ),
+            parse_mode="HTML",
         )
     except ParserError as e:
         await message.answer(f"❌ Не удалось обновить курсы: {e}")

@@ -98,4 +98,4 @@ async def _do_calc(message: Message, usd_amount: float) -> None:
     if warnings:
         text += "\n\n" + "\n".join(warnings)
 
-    await message.answer(text)
+    await message.answer(text, parse_mode="HTML")

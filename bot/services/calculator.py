@@ -40,36 +40,54 @@ def calculate(
     )
 
 
+def _e(emoji_id: str, placeholder: str) -> str:
+    return f'<tg-emoji emoji-id="{emoji_id}">{placeholder}</tg-emoji>'
+
+
+_MONEY  = _e("5404874922180748672", "💰")
+_WHITE  = _e("5382020701119080886", "⚪️")
+_GREEN  = _e("5382245959268859585", "🟢")
+_CHART  = _e("5258391025281408576", "📈")
+_BLACK  = _e("5229098454969507977", "⚫️")
+_ARROWS = _e("5435972693016982433", "↕️")
+
+
 def fmt_calc(result: CalcResult, ayil_updated_at: str, tbank_updated_at: str) -> str:
     r = result
     rub_exact_fmt = f"{r.rub_exact:,.0f}".replace(",", " ")
     rub_buf_fmt = f"{r.rub_buffered:,.0f}".replace(",", " ")
     kgs_fmt = f"{r.kgs_needed:,.1f}".replace(",", " ")
 
+    tbank_note = " <i>(ручной)</i>" if tbank_updated_at == "ручной курс" else ""
+
     return (
-        f"💰 Расчёт для {r.usd_amount:.2f}$\n"
+        f"{_MONEY} <b>Расчёт для {r.usd_amount:.2f}$</b>\n"
         f"\n"
         f"Нужно отправить:\n"
-        f"  ≈ {rub_exact_fmt} ₽ (точно)\n"
-        f"  ≈ {rub_buf_fmt} ₽ (с запасом {r.buffer_percent:.0f}%)\n"
+        f"{_WHITE}≈ {rub_exact_fmt} ₽ (точно)\n"
+        f"{_GREEN}≈ {rub_buf_fmt} ₽ (с запасом {r.buffer_percent:.0f}%)\n"
         f"\n"
-        f"📈 Курс Айыл Банка (на {ayil_updated_at})\n"
-        f"  USD → {r.rates.usd_sell:.2f} KGS\n"
-        f"🏦 Курс T-Банка (на {tbank_updated_at})\n"
-        f"  1 RUB → {r.rub_kgs_rate:.4f} KGS\n"
+        f"Цепочка:\n"
+        f"{rub_exact_fmt} ₽ → {kgs_fmt} KGS → {r.usd_amount:.2f}$\n"
         f"\n"
-        f"Цепочка: {rub_exact_fmt} ₽ → {kgs_fmt} KGS → {r.usd_amount:.2f}$"
+        f"{_CHART} <i>Курсы на {ayil_updated_at}</i>\n"
+        f"\n"
+        f"{_BLACK}Айыл Банк:\n"
+        f"{_ARROWS}1 USD → {r.rates.usd_sell:.2f} KGS\n"
+        f"\n"
+        f"{_BLACK}T-Банк{tbank_note}:\n"
+        f"{_ARROWS}1 RUB → {r.rub_kgs_rate:.4f} KGS"
     )
 
 
 def fmt_rates(rates: Rates, tbank_rate: float, ayil_updated_at: str, tbank_updated_at: str) -> str:
     return (
-        f"📊 Курсы валют\n"
+        f"{_CHART} <b>Курсы валют</b>\n"
         f"\n"
-        f"🏦 Айыл Банк (на {ayil_updated_at})\n"
-        f"  🇺🇸 USD продажа: {rates.usd_sell:.2f} KGS\n"
-        f"  🇺🇸 USD покупка: {rates.usd_buy:.2f} KGS\n"
+        f"{_BLACK}Айыл Банк <i>(на {ayil_updated_at})</i>:\n"
+        f"{_ARROWS}1 USD → {rates.usd_sell:.2f} KGS (продажа)\n"
+        f"{_ARROWS}1 USD → {rates.usd_buy:.2f} KGS (покупка)\n"
         f"\n"
-        f"🏦 T-Банк (на {tbank_updated_at})\n"
-        f"  🇷🇺 1 RUB → {tbank_rate:.4f} KGS (перевод)"
+        f"{_BLACK}T-Банк <i>(на {tbank_updated_at})</i>:\n"
+        f"{_ARROWS}1 RUB → {tbank_rate:.4f} KGS"
     )
