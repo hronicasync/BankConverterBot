@@ -6,6 +6,14 @@ Format: `[version] YYYY-MM-DD — description`
 
 ---
 
+## [0.9.0] 2026-04-20
+
+- Added `/emojiid` command — send it with a custom emoji in one message to get its `custom_emoji_id`
+- Updated `/calc` output to use Telegram Premium custom emojis and HTML formatting (bold header, italic rates timestamp, custom emoji per line)
+- Updated `/rates` output to use the same custom emoji style
+- `fmt_calc` and `fmt_rates` in `calculator.py` now return HTML; all callers pass `parse_mode="HTML"`
+- If manual RUB→KGS rate is active, T-Банк line in `/calc` shows `(ручной)` label
+
 ## [0.8.0] 2026-04-20
 
 - Fixed manual RUB→KGS rate (`/setrate`) being lost on container restart — rate is now persisted to `/data/manual_rate.txt` and restored on startup
