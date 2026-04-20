@@ -6,6 +6,15 @@ Format: `[version] YYYY-MM-DD — description`
 
 ---
 
+## [0.8.0] 2026-04-20
+
+- Fixed manual RUB→KGS rate (`/setrate`) being lost on container restart — rate is now persisted to `/data/manual_rate.txt` and restored on startup
+- Added `./data:/data` volume mount in `docker-compose.yml` so the rate file survives rebuilds
+
+## [0.7.0] 2026-04-20
+
+- Fixed KGS display in conversion chain: now shows 1 decimal place (e.g. `350.8 KGS`) instead of rounding to integer (`351 KGS`), matching T-Bank's actual credited amount
+
 ## [0.6.0] 2026-04-17
 
 - Fixed Ayil Bank scraping: switched from aiohttp to `curl-cffi` with Chrome impersonation to bypass Cloudflare TLS fingerprinting
